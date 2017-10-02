@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Trivia Time</title
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link href="https://fonts.googleapis.com/css?family=Bubbler+One|Lobster+Two:700" rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script type = "text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+  </head>
+  <body>
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <div class="row">
+          <h1>Capitals of the World</h1><br><br><br><br>
+          <div class="mainArea">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+    </div> <!-- /container -->
+
+
+    <script>
+/*
+You'll create a trivia form with multiple choice or true/false options (your choice).
+The player will have a limited amount of time to finish the quiz. 
+The game ends when the time runs out. The page will reveal the number of questions that players answer correctly and incorrectly.
+Don't let the player pick more than one answer per question.
+Don't forget to include a countdown timer.
+*/	
+
+$(document).ready(function() {
+
+  function initialScreen() {
+    startScreen = " <a class='start-button'>GO</a>";
+    $(".mainArea").html(startScreen);
+  }
+
+  initialScreen();
+
+//Create a function, makeHtml(), that is triggered by the start button, and generates the html
+
+$("body").on("click", ".start-button", function(event){
+  makeHtml();
+  timerWrapper();
+
+}); // Closes start-button click
+
+$("body").on("click", ".answer", function(event){
+  //answeredQuestion = true;
+  selectedAnswer = $(this).text();
+  if(selectedAnswer === correctAnswers[questionCounter]) {
+    //alert("correct");
+
+    clearInterval(theClock);
+    win();
+  }
+  else {
+    //alert("wrong answer!");
+    clearInterval(theClock);
+    loss();
+  }
+}); // Close .answer click
+
+$("body").on("click", ".reset-button", function(event){
+  resetGame();
+}); // Closes reset-button click
+
+});  //  Closes jQuery wrapper
+
+function lossTimeUp() {
+  unansweredTally++;
+  gameHTML = "<p class='text-center timer-p'>Time Remaining: <span class='timer'>" + counter + "</span></p>" + "<p class='text-center'>Too late!  The correct answer was: " + correctAnswers[questionCounter] + "</p>" + "<h1 class='text-center'> Time is Up </h1>";
+  $(".mainArea").html(gameHTML);
+  setTimeout(wait, 3000);  
+}
+
+
+function win() {
+  correctTally++;
+  gameHTML = "<p class='text-center timer-p'>Time Remaining: <span class='timer'>" + counter + "</span></p>" + "<p class='text-center'>Correct! The answer is: " + correctAnswers[questionCounter] + "</p>" + "<h1 class='text-center'>Yay!</h1>";
+  $(".mainArea").html(gameHTML);
+  setTimeout(wait, 3000);  
+}
+
+function loss() {
+  incorrectTally++;
+  gameHTML = "<p class='text-center timer-p'>Time Remaining: <span class='timer'>" + counter + "</span></p>" + "<p class='text-center'>Wrong! The correct answer is: "+ correctAnswers[questionCounter] + "</p>" + "<h1 class='text-center'> Incorrect </h1>";
+  $(".mainArea").html(gameHTML);
+  setTimeout(wait, 3000); 
+}
+
+function makeHtml() {
+  gameHTML = "<p class='text-center timer-p'>Time Remaining: <span class='timer'>10</span></p><p class='text-center'>" + questionArray[questionCounter] + "</p><p class='first-answer answer'>A. " + answerArray[questionCounter][0] + "</p><p class='answer'>B. "+answerArray[questionCounter][1]+"</p><p class='answer'>C. "+answerArray[questionCounter][2]+"</p><p class='answer'>D. "+answerArray[questionCounter][3]+"</p>";
+  $(".mainArea").html(gameHTML);
+}
+
+function wait() {
+  if (questionCounter < 7) {
+    questionCounter++;
+    makeHtml();
+    counter = 10;
+    timerWrapper();
+  }
+  else {
+    finalScreen();
+  }
+}
+
+function timerWrapper() {
+  theClock = setInterval(tenSeconds, 1000);
+  function tenSeconds() {
+    if (counter === 0) {
+      clearInterval(theClock);
+      lossTimeUp();
+    }
+    if (counter > 0) {
+      counter--;
+    }
+    $(".timer").html(counter);
+  }
+}
+
+function finalScreen() {
+  gameHTML = "<p class='text-center timer-p'>Time Remaining: <span class='timer'>" + counter + "</span></p>" + "<p class='text-center'>All done, here's how you did!" + "</p>" + "<p class='summary-correct'>Correct Answers: " + correctTally + "</p>" + "<p>Wrong Answers: " + incorrectTally + "</p>" + "<p>Unanswered: " + unansweredTally + "</p>" + "<p class='text-center reset-button-container'><a class='btn btn-danger btn-lg btn-block reset-button' href='#' role='button'>Play Again</a></p>";
+  $(".mainArea").html(gameHTML);
+}
+
+function resetGame() {
+  questionCounter = 0;
+  correctTally = 0;
+  incorrectTally = 0;
+  unansweredTally = 0;
+  counter = 10;
+  makeHtml();
+  timerWrapper();
+}
+
+var startScreen;
+var gameHTML;
+var counter = 10;
+var questionArray = ["What is the capital of Vietnam?", "What is the capital of Spain?", "What is the capital of Turkey?", "What is the capital of Japan?", "What is the capital of Mexico?", "What is the capital of Italy?", "What is the capital of Germany?", "What is the capital of Russia?"];
+var answerArray = [["Hanoi", "Da Nang", "Ho Chi Minh", "Can Tho"], ["Brazil","Madrid","Caracas","Columbia"], ["Istanbul","Hungary","Ankara", "Bursa"], ["Kyoto","Hiroshima","Tokyo","Hong Kong"], ["Puebla", "Cancun", "Puerto Vallarta", "Mexico City"], ["Venice","Rome","Milan", "Naples"], ["Munich","Frankfurt","Berlin","Stockholm"], ["Warsaw", "Kiev", "Moscow", "Tallinn"]];
+var correctAnswers = ["A. Hanoi", "B. Madrid", "C. Ankara", "C. Tokyo", "D. Mexico City", "B. Rome", "C. Berlin", "C. Moscow"];
+var questionCounter = 0;
+var selecterAnswer;
+var theClock;
+var correctTally = 0;
+var incorrectTally = 0;
+var unansweredTally = 0;
+
+
+</script>
+</body>
+</html>
